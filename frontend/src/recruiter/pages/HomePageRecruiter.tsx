@@ -5,7 +5,7 @@ import { PiBagFill } from 'react-icons/pi'
 import { useOffers } from '../hooks/useOffers'
 import useLocalStorage from '@/hooks/useLocalStorage'
 import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRecruiter } from '../hooks/useRecruiter'
 
 export default function HomePageRecruiter () {
@@ -13,11 +13,16 @@ export default function HomePageRecruiter () {
   const { recruiter } = useRecruiter({ email: storedValue?.email || '' })
   const { offers, setOffers, loadingOffers } = useOffers({ idReclutador: recruiter?.id || 0 })
   const navigate = useNavigate()
+  const [allOffers, setAllOffers] = useState(offers)
   
   useEffect(() => {
     if (storedValue?.role === 'admin') navigate('/admin')
     else if (storedValue?.role === 'candidate' || storedValue === null) navigate('/')
   }, [storedValue?.role])
+
+  useEffect(() => {
+    setAllOffers(offers)
+  }, [offers])
 
   return (
     <LayoutRecruiter>
@@ -29,7 +34,11 @@ export default function HomePageRecruiter () {
               <PiBagFill />
             </div>
           </div>
-          <HeaderOfferActions offers={offers} setOffers={setOffers} />
+          <HeaderOfferActions 
+            offers={offers}
+            setAllOffers={setAllOffers} 
+            setOffers={setOffers} 
+          />
           <div className='flex flex-col w-full gap-5'>
             {
               loadingOffers
@@ -43,14 +52,22 @@ export default function HomePageRecruiter () {
                 </div>
                   )
                 : (
-                    offers.map(offer => (
-                      <DrawerOfferInfo
-                        key={offer.id_oferta}
-                        offers={offers}
-                        offer={offer}
-                        setOffers={setOffers}
-                      />
-                    ))
+                    <>
+                      {allOffers.map(offer => (
+                        <DrawerOfferInfo
+                          key={offer.id_oferta}
+                          offers={offers}
+                          offer={offer}
+                          setOffers={setOffers}
+                        />
+                      ))}
+
+                      {allOffers.length === 0 && (
+                        <div className='py-16 text-xl italic font-semibold text-center bg-secondary'>
+                          No se encontraron ofertas
+                        </div>
+                      )}
+                    </>
                   )
             }
           </div>
