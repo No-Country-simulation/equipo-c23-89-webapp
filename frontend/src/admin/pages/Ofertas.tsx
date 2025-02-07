@@ -35,7 +35,7 @@ export function Ofertas () {
     const fetchOfertas = async () => {
       try {
         setIsLoading(true)
-        const response = await api.get('api/oferta')
+        const response = await api.get('/oferta')
 
         if (response.status !== 200) {
           throw new Error('Error al cargar las ofertas')
@@ -65,38 +65,21 @@ export function Ofertas () {
       <div className='mb-4 border-b-2 border-primary'>
         <label className='text-xl font-semibold'>Ofertas</label>
       </div>
-      <ul>
-        {ofertas.map((oferta) => (
-          <article key={oferta.id_oferta} className='p-4 rounded-lg bg-secondary'>
-            <div className='flex gap-4'>
-              <div className='w-6/6'>
-                <div className='flex gap-4'>
-                  <div className='w-1/6'>
-                    <img
-                      className='w-full'
-                      src="https://media.magneto365.com/image_assets/files/100969/original-07667a75-eade-41d6-8663-8aced564738e-.png?Expires=1737935999&Key-Pair-Id=KYGE9B84R3EDO&Signature=tZ-Hd8gFCuX8hwQBCVTwBRYAY0BnlhKEvkbVm5OSUddRxBDty4pW6ZhRVUuUfpySRm33hdCPpscQbvAb6rPpcXx2s2ZIbu3LpVLIA~qMGs39SqbTayxobrKi3QzNSsElLWZgLkRaYYFtw4K7Q7HX5wycUdDCkIDPXJGkCM1WMxO9LAgQBNvYOdcVADp27vf6rcMG1Ye1R4L3TOFB1ZAQ1qzc5q~R2usZseaZt-cMnxLvivxPa7qw5fOMC3IDTEypd82X-1sFWA2pOuhRknVYNiEthp6yw4EeQ58IsZDP6XNVOdFr-LDKim6YSEhMuJvRurpDLrxPIkU-6BFJOlDbZQ__"
-                      alt="Oferta"
-                    />
-                  </div>
-                  <div className='flex flex-col w-3/6'>
-                    <h3 className='font-bold'>{oferta.titulo}</h3>
-                    <p>{oferta.ubicacion}</p>
-                    <p>{oferta.fecha_publicacion}</p>
-      <div className="flex w-full items-center space-x-2 mb-4">
+      <div className="flex items-center w-full mb-4 space-x-2">
         <Input className='bg-secondary' type="text" placeholder="Buscar Ofertas" />
         <Button type="submit"><CiSearch /></Button>
       </div>
 
       {isLoading ? (
-        <div className="text-center text-xl text-gray-500">Cargando ofertas...</div>
+        <div className="text-xl text-center text-gray-500">Cargando ofertas...</div>
       ) : error ? (
-        <p className='text-center text-3xl text-gray-500'>{error}</p>
+        <p className='text-3xl text-center text-gray-500'>{error}</p>
       ) : ofertas.length === 0 ? (
-        <p className='text-center text-3xl text-gray-500'>No hay ofertas disponibles en este momento.</p>
+        <p className='text-3xl text-center text-gray-500'>No hay ofertas disponibles en este momento.</p>
       ) : (
         <ul>
           {ofertas.map((oferta) => (
-            <article key={oferta.id_oferta} className='bg-secondary rounded-lg p-4'>
+            <article key={oferta.id_oferta} className='p-4 rounded-lg bg-secondary'>
               <div className='flex gap-4'>
                 <div className='w-6/6'>
                   <div className='flex gap-4'>
@@ -107,7 +90,7 @@ export function Ofertas () {
                         alt="Oferta"
                       />
                     </div>
-                    <div className='w-3/6 flex flex-col'>
+                    <div className='flex flex-col w-3/6'>
                       <h3 className='font-bold'>{oferta.titulo}</h3>
                       <p>{oferta.ubicacion}</p>
                       <p>{oferta.fecha_publicacion}</p>
@@ -116,34 +99,19 @@ export function Ofertas () {
                       <p>{oferta.descripcion}</p>
                     </div>
                   </div>
-                  <div className='flex justify-between border-t-2 border-primary pt-4'>
+                  <div className='flex justify-between pt-4 border-t-2 border-primary'>
                     <p><strong>Postulados:</strong> 100</p>
                     <p><strong>Salario:</strong> ${oferta.salario}</p>
                   </div>
-                </div>
-                <div className='flex justify-between pt-4 border-t-2 border-primary'>
-                  <p><strong>Postulados:</strong> 100</p>
-                  <p><strong>Salario:</strong> ${oferta.salario}</p>
                 </div>
               </div>
               <div className='w-1/6 h-auto p-2 space-y-2 rounded-lg bg-accent'>
                 <button type='button' className='w-full py-1 text-white rounded-lg bg-primary'>Mostrar</button>
                 <button type='button' className='w-full py-1 text-white bg-red-600 rounded-lg'>Eliminar</button>
               </div>
-            </div>
           </article>
         ))}
       </ul>
-                <div className='w-1/6 p-2 h-auto bg-accent rounded-lg space-y-2'>
-                  <button type='button' className='w-full py-1 bg-primary rounded-lg text-white flex items-center px-2 gap-2'><GrView /> Mostrar</button>
-                  <button type='button' className='w-full py-1 bg-[#626564] rounded-lg text-white flex items-center px-2 gap-2'><FaRegEdit /> Editar</button>
-                  <button type='button' className='w-full py-1 bg-red-600 rounded-lg text-white flex items-center px-2 gap-2'><MdDeleteForever /> Eliminar</button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </ul>
       )}
     </div>
-  )
-}
+  )}

@@ -33,8 +33,6 @@
       "@services/*": ["./src/services/*"],
       "@pages/*": ["./src/pages/*"],
     }
-  }
-    "noUncheckedSideEffectImports": true
   },
   "include": ["src"]
 }

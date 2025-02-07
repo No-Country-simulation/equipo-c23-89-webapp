@@ -19,7 +19,7 @@ export function Candidatos () {
       <div className='mb-4 border-b-2 border-primary'>
         <label className='text-xl font-semibold'>Candidatos</label>
       </div>
-      <div className="flex w-full items-center space-x-2 mb-4">
+      <div className="flex items-center w-full mb-4 space-x-2">
         <Input className='bg-secondary' type="text" placeholder="Buscar Candidatos" />
         <Button type="submit"><CiSearch /></Button>
       </div>
