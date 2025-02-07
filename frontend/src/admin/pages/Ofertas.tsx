@@ -35,7 +35,7 @@ export function Ofertas () {
     const fetchOfertas = async () => {
       try {
         setIsLoading(true)
-        const response = await api.get('/oferta')
+        const response = await api.get('/api/oferta/')
 
         if (response.status !== 200) {
           throw new Error('Error al cargar las ofertas')

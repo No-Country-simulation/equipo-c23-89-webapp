@@ -9,13 +9,15 @@ import { type Offer } from '../types/offer'
 import { OFFER_INITIAL_VALUES } from '../initial-values/offer'
 import { useCandidatesPostulates } from '../hooks/useCandidatosPostulados'
 import useLocalStorage from '@/hooks/useLocalStorage'
+import { useRecruiter } from '../hooks/useRecruiter'
 
 export default function CandidatesOfferRecruiter () {
   const { offerId } = useParams()
-  const { offers } = useOffers({ idReclutador: 1 })
+  const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
+  const { recruiter } = useRecruiter({ email: storedValue?.email || '' })
+  const { offers } = useOffers({ idReclutador: recruiter?.id || 0 })
   const { candidatesPostulates, loadingCandidatesPostulates } = useCandidatesPostulates({ idOferta: Number(offerId) })
   const [offer, setOffer] = useState<Offer>(OFFER_INITIAL_VALUES)
-  const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
   const navigate = useNavigate()
 
   useEffect(() => {

@@ -15,6 +15,8 @@ import { offerSchema } from '../schemas/offerSchema'
 import api from '@/lib/api'
 import { type Offer } from '../types/offer'
 import { FaPencil } from 'react-icons/fa6'
+import useLocalStorage from '@/hooks/useLocalStorage'
+import { useRecruiter } from '../hooks/useRecruiter'
 
 interface EditOfferFormProps {
   offers: Offer[]
@@ -24,6 +26,8 @@ interface EditOfferFormProps {
 }
 
 export const EditOfferForm = ({ offers, offer, setOffers, setOpen }: EditOfferFormProps) => {
+  const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
+  const { recruiter } = useRecruiter({ email: storedValue?.email || '' })
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
@@ -41,12 +45,12 @@ export const EditOfferForm = ({ offers, offer, setOffers, setOpen }: EditOfferFo
     try {
       setIsLoading(true)
 
-      const response = await api.put(`/oferta/${offer.id_oferta}/`, {
+      const response = await api.put(`/api/oferta/${offer.id_oferta}/`, {
         titulo: values.title,
         descripcion: values.description,
         salario: values.salary,
         ubicacion: values.location,
-        id_reclutador: 1
+        id_reclutador: recruiter?.id
       })
 
       if (response.status === 200) {

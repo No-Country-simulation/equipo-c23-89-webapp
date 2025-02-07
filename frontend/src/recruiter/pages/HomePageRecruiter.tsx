@@ -6,12 +6,14 @@ import { useOffers } from '../hooks/useOffers'
 import useLocalStorage from '@/hooks/useLocalStorage'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import { useRecruiter } from '../hooks/useRecruiter'
 
 export default function HomePageRecruiter () {
-  const { offers, setOffers, loadingOffers } = useOffers({ idReclutador: 1 })
   const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
+  const { recruiter } = useRecruiter({ email: storedValue?.email || '' })
+  const { offers, setOffers, loadingOffers } = useOffers({ idReclutador: recruiter?.id || 0 })
   const navigate = useNavigate()
-
+  
   useEffect(() => {
     if (storedValue?.role === 'admin') navigate('/admin')
     else if (storedValue?.role === 'candidate' || storedValue === null) navigate('/')

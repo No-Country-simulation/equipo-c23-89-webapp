@@ -13,11 +13,11 @@ import useLocalStorage from '@/hooks/useLocalStorage'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/hooks/use-toast'
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import { useCandidatesPostulates } from '@/recruiter/hooks/useCandidatosPostulados'
 import { useUsers } from '@/recruiter/hooks/useUsers'
 import { useCandidates } from '@/recruiter/hooks/useCandidates'
 import { Candidate } from '@/recruiter/types/candidate'
+import api from '@/lib/api'
 
 interface DrawerOfferInfoProps {
   offer: OfferType
@@ -48,12 +48,6 @@ export const DrawerOfferInfo = ({ offer }: DrawerOfferInfoProps) => {
     const candidateUser = candidates.find(candidate => candidate.user.id === user?.id)
     const candidateUserPostulate = candidatesPostulates.find(candidate => candidate.candidato === candidateUser?.id)
 
-    if (offer?.id_oferta === 2) {
-      console.log({ user, candidateUser, candidateUserPostulate }, offer.id_oferta);
-      console.log(candidateUserPostulate !== undefined);
-      
-    }
-
     if (candidateUserPostulate !== undefined) setIsPostulate(true)
     if (candidateUser !== undefined) setCandidateInfo(candidateUser)
   }, [users, candidates, candidatesPostulates])
@@ -64,7 +58,7 @@ export const DrawerOfferInfo = ({ offer }: DrawerOfferInfoProps) => {
     try {
       setIsLoading(true)
 
-      const response = await axios.post('http://localhost:8000/aplicaciones/aplicaciones/', {
+      const response = await api.post('/aplicaciones/aplicaciones/', {
         candidato: candidateInfo?.id,
         fecha_aplicacion: new Date().toISOString(),
         estado: 'applied',
@@ -72,6 +66,7 @@ export const DrawerOfferInfo = ({ offer }: DrawerOfferInfoProps) => {
       })
 
       if (response.status === 201) {
+        setIsPostulate(true)
         toast({
           description: 'Postulación exitosamente!'
         })
