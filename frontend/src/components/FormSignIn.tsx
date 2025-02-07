@@ -37,7 +37,7 @@ export function FormSignIn () {
 
       setIsLoading(true)
 
-      const response = await api.post('/usuario/login/', new URLSearchParams({
+      const response = await api.post('/api/usuario/login/', new URLSearchParams({
         username: values.email,
         password: values.password
       }).toString(), {

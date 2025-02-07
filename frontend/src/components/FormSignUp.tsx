@@ -15,10 +15,14 @@ import api from '@/lib/api'
 import { FaSignInAlt } from 'react-icons/fa'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { formSignUpSchema } from '@/schemas/authSchema'
+import useLocalStorage from '@/hooks/useLocalStorage'
+import { useNavigate } from 'react-router-dom'
 
 export function FormSignUp () {
   const [isLoading, setIsLoading] = useState(false)
+  const { setValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
   const { toast } = useToast()
+  const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSignUpSchema>>({
     resolver: zodResolver(formSignUpSchema),
@@ -36,15 +40,26 @@ export function FormSignUp () {
     try {
       setIsLoading(true)
 
-      const response = await api.post('/usuario/register/', {
+      const response = await api.post('/api/usuario/register/', {
         email: values.email,
         password: values.password,
         first_name: values.firstName,
         last_name: values.lastName,
-        role: values.role
+        role: values.role,
+        company_name: 'No Country'
       })
 
       if (response.status === 201) {
+        switch (values.role) {
+          case 'recruiter':
+            navigate('/recruiter/home')
+            break
+          default:
+            navigate('/')
+            break
+        }
+
+        setValue({ email: values.email, role: values.role })
         toast({
           description: '¡Te registraste exitosamente!'
         })
