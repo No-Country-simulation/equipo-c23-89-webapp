@@ -2,26 +2,20 @@ import { Button } from '@components/ui/button'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons'
-import api from '@/lib/api'
+import useLocalStorage from '@/hooks/useLocalStorage'
 
 export function Header () {
+  const { removeValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const navigate = useNavigate()
+  const redirect = useNavigate()
 
   const sidebarEventClick = () => {
     setMenuOpen(!menuOpen)
   }
 
   const handleLogout = async () => {
-    try {
-      await api.post('/api/logout/')
-
-      localStorage.removeItem('token')
-
-      navigate('/')
-    } catch (error) {
-      console.error('Error al cerrar sesión', error)
-    }
+    removeValue()
+    redirect('/sign-in')
   }
 
   return (
@@ -47,9 +41,7 @@ export function Header () {
           <nav className="items-center justify-center hidden gap-4 md:flex">
             <ul className="flex gap-4 list-none">
               <li>
-                <Button variant={'outline'} onClick={handleLogout}>
-                  Cerrar Sesión
-                </Button>
+                <Button variant={'default'} onClick={handleLogout}>Cerrar sesión</Button>
               </li>
             </ul>
           </nav>
