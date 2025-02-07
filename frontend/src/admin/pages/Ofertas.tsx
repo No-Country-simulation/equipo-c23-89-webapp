@@ -20,6 +20,8 @@ interface Oferta {
 
 export function Ofertas () {
   const [ofertas, setOfertas] = useState<Oferta[]>([])
+  const [filteredOfertas, setFilteredOfertas] = useState<Oferta[]>([])
+  const [searchTerm, setSearchTerm] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
   const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
   const navigate = useNavigate()
@@ -42,9 +44,9 @@ export function Ofertas () {
         }
 
         const data = response.data
-
         if (Array.isArray(data)) {
           setOfertas(data)
+          setFilteredOfertas(data)
         } else {
           throw new Error('Formato de datos incorrecto')
         }
@@ -60,28 +62,48 @@ export function Ofertas () {
     fetchOfertas()
   }, [])
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const term = event.target.value
+    setSearchTerm(term)
+
+    const filtered = ofertas.filter(oferta =>
+      oferta.titulo.toLowerCase().includes(term.toLowerCase()) ||
+      oferta.descripcion.toLowerCase().includes(term.toLowerCase()) ||
+      oferta.ubicacion.toLowerCase().includes(term.toLowerCase())
+    )
+
+    setFilteredOfertas(filtered)
+  }
+
   return (
     <div>
       <div className='mb-4 border-b-2 border-primary'>
         <label className='text-xl font-semibold'>Ofertas</label>
       </div>
-      <div className="flex items-center w-full mb-4 space-x-2">
-        <Input className='bg-secondary' type="text" placeholder="Buscar Ofertas" />
-        <Button type="submit"><CiSearch /></Button>
+
+      <div className="flex w-full items-center space-x-2 mb-4">
+        <Input
+          className='bg-secondary'
+          type="text"
+          placeholder="Buscar Ofertas"
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+        <Button type="button"><CiSearch /></Button>
       </div>
 
       {isLoading ? (
         <div className="text-xl text-center text-gray-500">Cargando ofertas...</div>
       ) : error ? (
-        <p className='text-3xl text-center text-gray-500'>{error}</p>
-      ) : ofertas.length === 0 ? (
-        <p className='text-3xl text-center text-gray-500'>No hay ofertas disponibles en este momento.</p>
+        <p className='text-center text-3xl text-gray-500'>{error}</p>
+      ) : filteredOfertas.length === 0 ? (
+        <p className='text-center text-3xl text-gray-500'>No hay ofertas disponibles en este momento.</p>
       ) : (
         <ul>
-          {ofertas.map((oferta) => (
-            <article key={oferta.id_oferta} className='p-4 rounded-lg bg-secondary'>
-              <div className='flex gap-4'>
-                <div className='w-6/6'>
+          {filteredOfertas.map((oferta) => (
+            <article key={oferta.id_oferta} className='bg-secondary rounded-lg p-4 my-4'>
+              <div className='flex justify-between gap-4'>
+                <div className='flex-1 w-6/6'>
                   <div className='flex gap-4'>
                     <div className='w-1/6'>
                       <img
@@ -99,8 +121,7 @@ export function Ofertas () {
                       <p>{oferta.descripcion}</p>
                     </div>
                   </div>
-                  <div className='flex justify-between pt-4 border-t-2 border-primary'>
-                    <p><strong>Postulados:</strong> 100</p>
+                  <div className='flex justify-between border-t-2 border-primary pt-4'>
                     <p><strong>Salario:</strong> ${oferta.salario}</p>
                   </div>
                 </div>
