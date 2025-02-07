@@ -102,35 +102,36 @@ export function Ofertas () {
         <ul>
           {filteredOfertas.map((oferta) => (
             <article key={oferta.id_oferta} className='bg-secondary rounded-lg p-4 my-4'>
-              <div className='flex justify-between gap-4'>
-                <div className='flex-1 w-6/6'>
-                  <div className='flex gap-4'>
-                    <div className='w-1/6'>
-                      <img
-                        className='w-full'
-                        src="https://media.magneto365.com/image_assets/files/100969/original-07667a75-eade-41d6-8663-8aced564738e-.png"
-                        alt="Oferta"
-                      />
-                    </div>
-                    <div className='flex flex-col w-3/6'>
-                      <h3 className='font-bold'>{oferta.titulo}</h3>
-                      <p>{oferta.ubicacion}</p>
-                      <p>{oferta.fecha_publicacion}</p>
-                    </div>
-                    <div className='w-5/6'>
-                      <p>{oferta.descripcion}</p>
-                    </div>
+              <div className='flex justify-between'>
+                <div className='flex justify-between gap-4'>
+                  <div className='w-24 h-24 flex-none'>
+                    <img
+                      className='w-full'
+                      src="https://media.magneto365.com/image_assets/files/100969/original-07667a75-eade-41d6-8663-8aced564738e-.png"
+                      alt="Oferta"
+                    />
                   </div>
-                  <div className='flex justify-between border-t-2 border-primary pt-4'>
-                    <p><strong>Salario:</strong> ${oferta.salario}</p>
+                  <div className='w-48 space-y-2 break-words flex flex-col'>
+                    <h3 className='font-bold'>{oferta.titulo}</h3>
+                    <p>{oferta.ubicacion}</p>
+                    <p>{oferta.fecha_publicacion}</p>
+                  </div>
+                  <div className="max-w-xs break-words whitespace-normal">
+                    <p>{oferta.descripcion}</p>
                   </div>
                 </div>
+                <div className='flex flex-col space-y-2'>
+                  <Button className='bg-primary text-white flex items-center gap-2'><GrView /> Ver</Button>
+                  <Button className='bg-gray-600 text-white flex items-center gap-2'><FaRegEdit /> Editar</Button>
+                  <Button className='bg-red-600 text-white flex items-center gap-2'><MdDeleteForever /> Eliminar</Button>
+                </div>
               </div>
-              <div className='w-1/6 h-auto p-2 space-y-2 rounded-lg bg-accent'>
-                <button type='button' className='w-full py-1 text-white rounded-lg bg-primary'>Mostrar</button>
-                <button type='button' className='w-full py-1 text-white bg-red-600 rounded-lg'>Eliminar</button>
+              <div className='flex justify-between border-t-2 border-primary w-full my-4 pt-2'>
+                <p><strong>Salario:</strong> ${oferta.salario}</p>
               </div>
+              
           </article>
+          
         ))}
       </ul>
       )}
