@@ -11,20 +11,21 @@ import {
 import { type z } from 'zod'
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
-import { AiFillFileAdd } from 'react-icons/ai'
 import { offerSchema } from '../schemas/offerSchema'
 import api from '@/lib/api'
 import { type Offer } from '../types/offer'
+import { FaPencil } from 'react-icons/fa6'
 import useLocalStorage from '@/hooks/useLocalStorage'
 import { useRecruiter } from '../hooks/useRecruiter'
 
-interface AddOfferFormProps {
+interface EditOfferFormProps {
   offers: Offer[]
+  offer: Offer
   setOffers: any
   setOpen: any
 }
 
-export const AddOfferForm = ({ offers, setOffers, setOpen }: AddOfferFormProps) => {
+export const EditOfferForm = ({ offers, offer, setOffers, setOpen }: EditOfferFormProps) => {
   const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
   const { recruiter } = useRecruiter({ email: storedValue?.email || '' })
   const [isLoading, setIsLoading] = useState(false)
@@ -33,10 +34,10 @@ export const AddOfferForm = ({ offers, setOffers, setOpen }: AddOfferFormProps) 
   const form = useForm<z.infer<typeof offerSchema>>({
     resolver: zodResolver(offerSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      salary: '',
-      location: ''
+      title: offer.titulo,
+      description: offer.descripcion,
+      salary: offer.salario.toString(),
+      location: offer.ubicacion
     }
   })
 
@@ -44,28 +45,29 @@ export const AddOfferForm = ({ offers, setOffers, setOpen }: AddOfferFormProps) 
     try {
       setIsLoading(true)
 
-      const response = await api.post('/api/oferta/', {
+      const response = await api.put(`/api/oferta/${offer.id_oferta}/`, {
         titulo: values.title,
         descripcion: values.description,
-        ubicacion: values.location,
         salario: values.salary,
-        fecha_publicacion: new Date().toISOString(),
+        ubicacion: values.location,
         id_reclutador: recruiter?.id
       })
 
-      if (response.status === 201) {
-        const newOfffers = [response.data, ...offers]
+      if (response.status === 200) {
+        const newOfffers = offers.map((o) => o.id_oferta === offer.id_oferta ? response.data : o)
         setOffers(newOfffers)
         setOpen(false)
 
         toast({
-          description: '¡Oferta agregada exitosamente!'
+          description: '¡Oferta actualizada exitosamente!'
         })
       }
     } catch (error: any) {
+      console.log(error)
+
       toast({
         title: '¡Oh no!, ocurrió un error',
-        description: '¡La oferta no se pudo agregar correctamente!'
+        description: '¡La oferta no se pudo actualizar correctamente!'
       })
     } finally {
       setIsLoading(false)
@@ -131,10 +133,10 @@ export const AddOfferForm = ({ offers, setOffers, setOpen }: AddOfferFormProps) 
           <button type="submit" className='flex items-center justify-center w-full gap-2 px-8 py-3 font-semibold text-white transition-all duration-300 rounded-md bg-primary hover:brightness-110'>
             {!isLoading && (
               <div className='text-2xl'>
-                <AiFillFileAdd />
+                <FaPencil />
               </div>
             )}
-            {isLoading ? 'Cargando...' : 'Agregar oferta'}
+            {isLoading ? 'Cargando...' : 'Editar oferta'}
           </button>
         </div>
       </form>

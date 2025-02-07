@@ -1,14 +1,16 @@
 import { Button } from '@components/ui/button'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { PopoverComponent } from '@components/ui/popover'
 import { HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons'
-
 import navigation from './navigation.json'
+import useLocalStorage from '@/hooks/useLocalStorage'
 
 export function Header () {
   const [menuOpen, setMenuOpen] = useState(false)
+  const { storedValue, removeValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
   const navigate = useLocation()
+  const redirect = useNavigate()
 
   const navItems = [
     { path: '/sign-in', label: 'Iniciar Sesión' },
@@ -17,22 +19,17 @@ export function Header () {
 
   const sidebarEventClick = () => {
     setMenuOpen(!menuOpen)
-    // alert(`Menu toggled: ${!menuOpen}`);
   }
 
   const getRol = () => {
-    const role = localStorage.getItem('role')
+    if (!storedValue) return null
 
-    switch (role) {
-      case 'admin':
-        return 'admin'
-      case 'candidato':
-        return 'candidato'
-      case 'reclutador':
-        return 'reclutador'
-      default:
-        return 'user'
-    }
+    return storedValue.role
+  }
+
+  const signOut = () => {
+    removeValue()
+    redirect('/sign-in')
   }
 
   return (
@@ -56,20 +53,27 @@ export function Header () {
           </Link>
           <nav className="items-center justify-center hidden gap-4 md:flex">
             {
-              getRol() === 'candidato'
-                ? <>
-                  <Link to='/'>
+              getRol() === 'candidate' &&
+                <>
+                  {/* <Link to='/'>
                     <Button variant={navigate.pathname === '/' ? 'default' : 'secondary'}>Inicio</Button>
                   </Link>
                   <Link to='/empleos'>
                     <Button variant={navigate.pathname === '/empleos' ? 'default' : 'secondary'}>Empleos</Button>
-                  </Link>
+                  </Link> */}
                 </>
-                : navigation.map(({ name, path, variant }, inx) => (
-                <Link key={inx} to={path}>
-                    <Button variant={variant as 'secondary' | 'default' | 'link' | 'destructive' | 'outline' | 'ghost' || 'default'}>{name}</Button>
-                </Link>
+            }
+
+            {
+              getRol() === null
+                ? navigation.map(({ name, path, variant }, inx) => (
+                    <Link key={inx} to={path}>
+                      <Button variant={variant as 'secondary' | 'default' | 'link' | 'destructive' | 'outline' | 'ghost' || 'default'}>{name}</Button>
+                    </Link>
                 ))
+                : (
+                    <Button variant={'default'} onClick={signOut}>Cerrar sesión</Button>
+                  )
             }
           </nav>
 

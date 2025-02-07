@@ -1,7 +1,7 @@
-import { type User } from './recruiter'
+import { User } from "./recruiter"
 
 export interface Candidate {
-  id_candidato: number
+  id: number
   user: User
   experiencia: string
   educacion: string

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import useLocalStorage from '@/hooks/useLocalStorage'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { CiSearch } from 'react-icons/ci'
@@ -47,6 +49,14 @@ export function Reclutadores () {
 
     fetchReclutadores()
   }, [])
+    
+  const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (storedValue?.role === 'recruiter') navigate('/recruiter/home')
+    else if (storedValue?.role === 'candidate' || storedValue === null) navigate('/')
+  }, [storedValue?.role])
 
   const reclutadoresFiltrados = reclutadores.filter((reclutador) =>
     `${reclutador.first_name} ${reclutador.last_name}`.toLowerCase().includes(search.toLowerCase())

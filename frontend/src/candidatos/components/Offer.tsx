@@ -1,14 +1,11 @@
+import { Offer as OfferType } from '@/recruiter/types/offer'
 import { IoIosArrowForward } from 'react-icons/io'
-import { type Offer as OfferType } from '../types/offer'
-import { useCandidatesPostulates } from '../hooks/useCandidatosPostulados'
 
 interface OfferInfoProps {
   offer: OfferType
 }
 
 export const Offer = ({ offer }: OfferInfoProps) => {
-  const { candidatesPostulates, loadingCandidatesPostulates } = useCandidatesPostulates({ idOferta: Number(offer.id_oferta) })
-
   const formatDate = (isoString: string) => {
     const date = new Date(isoString)
     const day = String(date.getUTCDate()).padStart(2, '0')
@@ -36,12 +33,6 @@ export const Offer = ({ offer }: OfferInfoProps) => {
       </div>
       <div className='absolute right-5 top-[40%] opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-5 group-hover:translate-x-0'>
         <IoIosArrowForward className='text-4xl text-primary' />
-      </div>
-      <div className='absolute flex items-center justify-center gap-2 bottom-4 left-6'>
-        <span className='italic font-semibold'>Postulados:</span>
-        <span className='px-3 py-1 text-xl italic font-bold bg-white border border-primary rounded-xl'>
-          {loadingCandidatesPostulates ? '...' : candidatesPostulates.length}
-        </span>
       </div>
       <div className='absolute flex items-center justify-center gap-2 bottom-4 right-5'>
         <span className='italic font-semibold'>Salario:</span>

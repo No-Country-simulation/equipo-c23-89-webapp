@@ -14,7 +14,7 @@ export function Header () {
 
   const handleLogout = async () => {
     try {
-      await api.post('/logout/')
+      await api.post('/api/logout/')
 
       localStorage.removeItem('token')
 
@@ -26,14 +26,14 @@ export function Header () {
 
   return (
     <>
-      <header className="py-4 bg-accent border-b-2 border-accent z-30">
-        <div className="mx-16 flex items-center justify-between">
-          <div className="md:hidden block">
+      <header className="z-30 py-4 border-b-2 bg-accent border-accent">
+        <div className="flex items-center justify-between mx-16">
+          <div className="block md:hidden">
             <button onClick={sidebarEventClick} className="flex items-center justify-center">
               {menuOpen ? (
-                <Cross1Icon className="mr-2 w-6 h-6" />
+                <Cross1Icon className="w-6 h-6 mr-2" />
               ) : (
-                <HamburgerMenuIcon className="mr-2 w-6 h-6" />
+                <HamburgerMenuIcon className="w-6 h-6 mr-2" />
               )}
             </button>
           </div>
@@ -44,8 +44,8 @@ export function Header () {
               className="w-[120px] object-contain"
             />
           </Link>
-          <nav className="hidden md:flex items-center justify-center gap-4">
-            <ul className="list-none flex gap-4">
+          <nav className="items-center justify-center hidden gap-4 md:flex">
+            <ul className="flex gap-4 list-none">
               <li>
                 <Button variant={'outline'} onClick={handleLogout}>
                   Cerrar Sesión

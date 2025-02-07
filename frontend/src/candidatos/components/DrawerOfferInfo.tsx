@@ -1,4 +1,4 @@
-import { IoPaperPlane } from 'react-icons/io5'
+import { IoPushSharp } from 'react-icons/io5'
 import {
   Drawer,
   DrawerClose,
@@ -8,19 +8,31 @@ import {
   DrawerTrigger
 } from '@/components/ui/drawer'
 import { Offer } from './Offer'
-import { type Offer as OfferType } from '../types/offer'
-import { ModalEditOfferForm } from './ModalEditForm'
-import { Link } from 'react-router-dom'
-import { useCandidatesPostulates } from '../hooks/useCandidatosPostulados'
+import { Offer as OfferType } from '@/recruiter/types/offer'
+import useLocalStorage from '@/hooks/useLocalStorage'
+import { useNavigate } from 'react-router-dom'
+import { useToast } from '@/hooks/use-toast'
+import { useEffect, useState } from 'react'
+import { useCandidatesPostulates } from '@/recruiter/hooks/useCandidatosPostulados'
+import { useUsers } from '@/recruiter/hooks/useUsers'
+import { useCandidates } from '@/recruiter/hooks/useCandidates'
+import { Candidate } from '@/recruiter/types/candidate'
+import api from '@/lib/api'
 
 interface DrawerOfferInfoProps {
-  offers: OfferType[]
   offer: OfferType
-  setOffers: any
 }
 
-export const DrawerOfferInfo = ({ offers, offer, setOffers }: DrawerOfferInfoProps) => {
-  const { candidatesPostulates, loadingCandidatesPostulates } = useCandidatesPostulates({ idOferta: Number(offer.id_oferta) })
+export const DrawerOfferInfo = ({ offer }: DrawerOfferInfoProps) => {
+  const [candidateInfo, setCandidateInfo] = useState<Candidate | undefined>(undefined)
+  const [isPostulate, setIsPostulate] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
+  const { candidatesPostulates } = useCandidatesPostulates({ idOferta: Number(offer.id_oferta) })
+  const { users } = useUsers()
+  const { candidates } = useCandidates()
+  const navigate = useNavigate()
+  const { toast } = useToast()
 
   const formatDate = (isoString: string) => {
     const date = new Date(isoString)
@@ -29,6 +41,44 @@ export const DrawerOfferInfo = ({ offers, offer, setOffers }: DrawerOfferInfoPro
     const year = date.getUTCFullYear()
 
     return `${day}/${month}/${year}`
+  }
+
+  useEffect(() => {
+    const user = users.find(user => user.email === storedValue?.email)
+    const candidateUser = candidates.find(candidate => candidate.user.id === user?.id)
+    const candidateUserPostulate = candidatesPostulates.find(candidate => candidate.candidato === candidateUser?.id)
+
+    if (candidateUserPostulate !== undefined) setIsPostulate(true)
+    if (candidateUser !== undefined) setCandidateInfo(candidateUser)
+  }, [users, candidates, candidatesPostulates])
+
+  const handleAplicacion = async () => {
+    if (storedValue?.role === undefined) navigate('/sign-in')
+
+    try {
+      setIsLoading(true)
+
+      const response = await api.post('/aplicaciones/aplicaciones/', {
+        candidato: candidateInfo?.id,
+        fecha_aplicacion: new Date().toISOString(),
+        estado: 'applied',
+        oferta: offer.id_oferta
+      })
+
+      if (response.status === 201) {
+        setIsPostulate(true)
+        toast({
+          description: '¡Postulación exitosamente!'
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: '¡Oh no!, ocurrió un error',
+        description: '¡No se pudo postular correctamente!'
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -56,12 +106,6 @@ export const DrawerOfferInfo = ({ offers, offer, setOffers }: DrawerOfferInfoPro
                 <p className='my-5 pr-12 h-[110px] overflow-y-auto'>{offer.descripcion}</p>
                 <div className='flex items-center justify-between'>
                   <div className='flex items-center justify-center gap-2'>
-                    <span className='italic font-semibold'>Postulados:</span>
-                    <span className='px-3 py-1 text-xl italic font-bold bg-white border border-primary rounded-xl'>
-                      {loadingCandidatesPostulates ? '...' : candidatesPostulates.length}
-                    </span>
-                  </div>
-                  <div className='flex items-center justify-center gap-2'>
                     <span className='italic font-semibold'>Salario:</span>
                     <span className='px-3 py-1 text-xl italic font-bold bg-white border border-primary rounded-xl'>$ {offer.salario}</span>
                   </div>
@@ -70,17 +114,18 @@ export const DrawerOfferInfo = ({ offers, offer, setOffers }: DrawerOfferInfoPro
             </div>
           </div>
           <DrawerFooter className='p-6'>
-            <ModalEditOfferForm
-              offers={offers}
-              offer={offer}
-              setOffers={setOffers}
-            />
-            <Link to={`/recruiter/offer/${offer.id_oferta}`} className='flex items-center justify-center w-full gap-2 px-8 py-3 font-semibold text-white transition-all duration-300 rounded-md bg-primary hover:brightness-110'>
-              <div className='text-2xl'>
-                <IoPaperPlane />
-              </div>
-              Visualizar candidatos
-            </Link>
+            <button className={`flex items-center justify-center w-full gap-2 px-8 py-3 font-semibold text-white transition-all duration-300 rounded-md bg-primary hover:brightness-110 ${isPostulate && 'opacity-60 cursor-not-allowed'}`} onClick={handleAplicacion} disabled={isPostulate}>
+              {
+                !isLoading && (
+                  <div className='text-2xl'>
+                    <IoPushSharp />
+                  </div>
+                )
+              }
+              {
+                isPostulate ? 'Ya te postulaste' : isLoading ? 'Cargando...' : 'Aplicar a la vacante'
+              }
+            </button>
             <DrawerClose asChild>
               <button className='flex items-center justify-center w-full gap-2 px-8 py-3 font-semibold transition-all duration-300 border rounded-md bg-background border-primary hover:bg-gray-100'>
                 Cancelar

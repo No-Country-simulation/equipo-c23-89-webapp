@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import useLocalStorage from '@/hooks/useLocalStorage'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { CiSearch } from 'react-icons/ci'
@@ -21,13 +23,21 @@ export function Ofertas () {
   const [filteredOfertas, setFilteredOfertas] = useState<Oferta[]>([])
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
+  const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (storedValue?.role === 'recruiter') navigate('/recruiter/home')
+    else if (storedValue?.role === 'candidate' || storedValue === null) navigate('/')
+  }, [storedValue?.role])
+          
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchOfertas = async () => {
       try {
         setIsLoading(true)
-        const response = await api.get('api/oferta')
+        const response = await api.get('/api/oferta/')
 
         if (response.status !== 200) {
           throw new Error('Error al cargar las ofertas')
@@ -67,7 +77,7 @@ export function Ofertas () {
 
   return (
     <div>
-      <div className='border-b-2 border-primary mb-4'>
+      <div className='mb-4 border-b-2 border-primary'>
         <label className='text-xl font-semibold'>Ofertas</label>
       </div>
 
@@ -83,7 +93,7 @@ export function Ofertas () {
       </div>
 
       {isLoading ? (
-        <div className="text-center text-xl text-gray-500">Cargando ofertas...</div>
+        <div className="text-xl text-center text-gray-500">Cargando ofertas...</div>
       ) : error ? (
         <p className='text-center text-3xl text-gray-500'>{error}</p>
       ) : filteredOfertas.length === 0 ? (
@@ -102,7 +112,7 @@ export function Ofertas () {
                         alt="Oferta"
                       />
                     </div>
-                    <div className='w-3/6 flex flex-col'>
+                    <div className='flex flex-col w-3/6'>
                       <h3 className='font-bold'>{oferta.titulo}</h3>
                       <p>{oferta.ubicacion}</p>
                       <p>{oferta.fecha_publicacion}</p>
@@ -115,16 +125,14 @@ export function Ofertas () {
                     <p><strong>Salario:</strong> ${oferta.salario}</p>
                   </div>
                 </div>
-                <div className='w-1/6 p-2 h-auto bg-accent rounded-lg space-y-2'>
-                  <button type='button' className='w-full py-1 bg-primary rounded-lg text-white flex items-center px-2 gap-2'><GrView /> Mostrar</button>
-                  <button type='button' className='w-full py-1 bg-[#626564] rounded-lg text-white flex items-center px-2 gap-2'><FaRegEdit /> Editar</button>
-                  <button type='button' className='w-full py-1 bg-red-600 rounded-lg text-white flex items-center px-2 gap-2'><MdDeleteForever /> Eliminar</button>
-                </div>
               </div>
-            </article>
-          ))}
-        </ul>
+              <div className='w-1/6 h-auto p-2 space-y-2 rounded-lg bg-accent'>
+                <button type='button' className='w-full py-1 text-white rounded-lg bg-primary'>Mostrar</button>
+                <button type='button' className='w-full py-1 text-white bg-red-600 rounded-lg'>Eliminar</button>
+              </div>
+          </article>
+        ))}
+      </ul>
       )}
     </div>
-  )
-}
+  )}

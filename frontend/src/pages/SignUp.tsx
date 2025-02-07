@@ -1,7 +1,15 @@
 import { FormSignUp } from '@/components/FormSignUp'
-import { Link } from 'react-router-dom'
+import useLocalStorage from '@/hooks/useLocalStorage'
+import { Link, useNavigate } from 'react-router-dom'
 
 export function SignUp () {
+  const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
+  const navigate = useNavigate()
+
+  if (storedValue?.role === 'admin') navigate('/admin')
+  else if (storedValue?.role === 'recruiter') navigate('/recruiter/home')
+  else if (storedValue?.role === 'candidate') navigate('/')
+
   return (
     <main className='flex justify-between w-full h-screen'>
       <section className='flex flex-col items-center w-3/6 py-12 bg-secondary'>

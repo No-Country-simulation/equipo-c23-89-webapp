@@ -13,7 +13,7 @@ export function useAuth () {
       setIsLoading(true)
       // console.log(values)
 
-      const response = await api.post('/login/', values)
+      const response = await api.post('/api/login/', values)
       console.log('Respuesta de :', response.data)
       const { token } = response.data
 

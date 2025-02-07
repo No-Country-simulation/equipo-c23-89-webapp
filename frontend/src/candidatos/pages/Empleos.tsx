@@ -3,6 +3,9 @@ import Profile from '../components/_shared/profile/Profile'
 import Search from '../components/searchbar/Search'
 import Card from '../components/card/Card'
 import Filter from '../components/filter/Filter'
+import useLocalStorage from '@/hooks/useLocalStorage'
+import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
 const empleos = [
   {
@@ -40,6 +43,14 @@ const empleos = [
 ]
 
 const Empleos = () => {
+  const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (storedValue?.role === 'admin') navigate('/admin')
+    else if (storedValue?.role === 'recruiter') navigate('/recruiter/home')
+  }, [storedValue?.role])
+
   return (
     <div className='max-w-[1400px] mx-auto mt-24 px-4 flex gap-6'>
       <Profile />

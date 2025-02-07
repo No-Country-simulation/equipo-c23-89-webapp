@@ -11,13 +11,17 @@ import {
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { FaSignInAlt } from 'react-icons/fa'
-import axios from 'axios'
 import { formSignInSchema } from '@/schemas/authSchema'
+import api from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
+import useLocalStorage from '@/hooks/useLocalStorage'
+import { useNavigate } from 'react-router-dom'
 
 export function FormSignIn () {
   const [isLoading, setIsLoading] = useState(false)
+  const { setValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
   const { toast } = useToast()
+  const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSignInSchema>>({
     resolver: zodResolver(formSignInSchema),
@@ -33,12 +37,31 @@ export function FormSignIn () {
 
       setIsLoading(true)
 
-      const response = await axios.post('/login', {
-        email: values.email,
+      const response = await api.post('/api/usuario/login/', new URLSearchParams({
+        username: values.email,
         password: values.password
+      }).toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       })
 
       if (response.status === 200) {
+        const user = response.data.user
+
+        switch (user.role) {
+          case 'admin':
+            navigate('/admin')
+            break
+          case 'recruiter':
+            navigate('/recruiter/home')
+            break
+          default:
+            navigate('/')
+            break
+        }
+
+        setValue(user)
         toast({
           description: '¡Inicio de sesión exitosamente!'
         })
