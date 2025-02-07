@@ -35,9 +35,6 @@ isodate==0.7.2
 joblib==1.4.2
 leather==0.4.0
 Markdown==3.7
-mysql==0.0.3
-mysql-connector-python==9.1.0
-mysqlclient==2.2.5
 nltk==3.9.1
 numpy==2.1.2
 oauth2client==4.1.3
