@@ -38,7 +38,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/usuario/', include('core.usuario.urls')),  # Rutas de la app usuario
     path('api/reclutador/', include('core.reclutador.urls')),
-    path('api/oferta', include('core.oferta.urls')),
+    path('api/oferta/', include('core.oferta.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),# Rutas de la app recruiter
     path('candidatos/', include('core.candidato.urls')),
     path('aplicaciones/', include('core.aplicacion.urls')),
