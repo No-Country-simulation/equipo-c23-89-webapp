@@ -3,7 +3,7 @@ import { useRecruiterStore } from '../store/recruiter'
 import api from '@/lib/api'
 import { type Recruiter } from '../types/recruiter'
 
-export const useRecruiter = ({ id }: { id: number }) => {
+export const useRecruiter = ({ email }: { email: string }) => {
   const recruiter = useRecruiterStore(state => state.recruiter)
   const setRecruiter = useRecruiterStore(state => state.setRecruiter)
   const [loadingRecruiter, setLoadingRecruiter] = useState(false)
@@ -13,9 +13,10 @@ export const useRecruiter = ({ id }: { id: number }) => {
       try {
         setLoadingRecruiter(true)
 
-        const response = await api.get(`/reclutador/recruiters/${id}`)
+        const response = await api.get(`/api/reclutador/recruiters/`)
+        const recruiterLogged = response.data.find((recruiter: Recruiter) => recruiter.user.email === email)
 
-        setRecruiter(response.data as Recruiter)
+        setRecruiter(recruiterLogged)
       } catch (error) {
         console.log(error)
       } finally {
@@ -24,7 +25,7 @@ export const useRecruiter = ({ id }: { id: number }) => {
     }
 
     getRecruiter()
-  }, [])
+  }, [email])
 
   return { recruiter, loadingRecruiter, setRecruiter }
 }

@@ -13,7 +13,7 @@ export const useUsers = () => {
       try {
         setLoadingUsers(true)
 
-        const response = await api.get('/usuario/users/')
+        const response = await api.get('/api/usuario/users/')
 
         setUsers(response.data as User[])
       } catch (error) {

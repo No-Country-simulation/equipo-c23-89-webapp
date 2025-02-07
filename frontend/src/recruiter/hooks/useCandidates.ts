@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useCandidateStore } from '../store/candidate'
 import { type Candidate } from '../types/candidate'
-import axios from 'axios'
+import api from '@/lib/api'
 
 export const useCandidates = () => {
   const candidates = useCandidateStore(state => state.candidates)
@@ -13,7 +13,7 @@ export const useCandidates = () => {
       try {
         setLoadingCandidates(true)
 
-        const response = await axios.get('http://localhost:8000/candidatos/candidatos/')
+        const response = await api.get('/candidatos/candidatos/')
 
         setCandidates(response.data as Candidate[])
       } catch (error) {

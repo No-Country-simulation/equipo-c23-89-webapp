@@ -15,10 +15,10 @@ export const useOffers = ({ idReclutador }: { idReclutador?: number }) => {
       try {
         setLoadingOffers(true)
 
-        const response = await api.get('/oferta')
+        const response = await api.get('/api/oferta/')
         const ofertas = response.data as Offer[]
         const ofertasFiltradas = ofertas.filter(oferta => oferta.id_reclutador === idReclutador)
-
+        
         setAllOffers(ofertas)
         setOffers(ofertasFiltradas)
       } catch (error) {
@@ -29,7 +29,7 @@ export const useOffers = ({ idReclutador }: { idReclutador?: number }) => {
     }
 
     getOffers()
-  }, [])
+  }, [idReclutador])
 
   return { allOffers, offers, loadingOffers, setOffers, setAllOffers }
 }
