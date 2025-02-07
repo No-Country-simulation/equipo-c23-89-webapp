@@ -55,13 +55,12 @@ export function Header () {
             {
               getRol() === 'candidate' &&
                 <>
-                  <Link to='/'>
+                  {/* <Link to='/'>
                     <Button variant={navigate.pathname === '/' ? 'default' : 'secondary'}>Inicio</Button>
                   </Link>
                   <Link to='/empleos'>
                     <Button variant={navigate.pathname === '/empleos' ? 'default' : 'secondary'}>Empleos</Button>
-                  </Link>
-                  <Button variant={'default'} onClick={signOut}>Cerrar sesión</Button>
+                  </Link> */}
                 </>
             }
 
