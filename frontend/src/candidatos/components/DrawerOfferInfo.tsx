@@ -68,7 +68,7 @@ export const DrawerOfferInfo = ({ offer }: DrawerOfferInfoProps) => {
       if (response.status === 201) {
         setIsPostulate(true)
         toast({
-          description: 'Postulación exitosamente!'
+          description: '¡Postulación exitosamente!'
         })
       }
     } catch (error: any) {

@@ -35,7 +35,7 @@ function App () {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/recruiter/home" element={<HomePageRecruiter />} />
         <Route path="/recruiter/offer/:offerId" element={<CandidatesOfferRecruiter />} />
-        <Route path="/recruiter/candidate/:candidateId" element={<CandidateRecruiter />} />
+        <Route path="/recruiter/candidate/:offerId/:candidateId" element={<CandidateRecruiter />} />
       </Routes>
       <Toaster />
     </>

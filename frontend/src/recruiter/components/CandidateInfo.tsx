@@ -6,6 +6,8 @@ import { useCandidatesPostulates } from '../hooks/useCandidatosPostulados'
 import { useEffect, useState } from 'react'
 import { type User } from '../types/recruiter'
 import { useNavigate } from 'react-router-dom'
+import api from '@/lib/api'
+import { useToast } from '@/hooks/use-toast'
 
 interface CandidateInfoProps {
   offerId: number
@@ -14,14 +16,56 @@ interface CandidateInfoProps {
 }
 
 export const CandidateInfo = ({ offerId, candidateInfo, candidateInfo2 }: CandidateInfoProps) => {
+  const [isLoading, setIsLoading] = useState(false)
   const [candidate, setCandidate] = useState<Aplicacion | undefined>(undefined)
   const { candidatesPostulates } = useCandidatesPostulates({ idOferta: offerId })
+  const { toast } = useToast()
   const navigate = useNavigate()
 
   useEffect(() => {
-    const candidatePostulate = candidatesPostulates.find(c => c.candidato === candidateInfo?.usuario)
+    const candidatePostulate = candidatesPostulates.find(c => c.candidato === candidateInfo?.id)
+    
     setCandidate(candidatePostulate)
   }, [candidatesPostulates])
+
+  const formatDate = (isoString: string | undefined) => {
+    if (!isoString) return ''
+
+    const date = new Date(isoString)
+    const day = String(date.getUTCDate()).padStart(2, '0')
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const year = date.getUTCFullYear()
+
+    return `${day}/${month}/${year}`
+  }
+
+  const handleNextStep = async () => {
+    try {
+      setIsLoading(true)
+
+      const newEstado = candidate?.estado === 'applied' ? 'viewed' : candidate?.estado === 'viewed' ? 'inProcess' : candidate?.estado === 'inProcess' ? 'finalist' : 'finalist'
+      const response = await api.put(`/aplicaciones/aplicaciones/${candidate?.id_aplicacion}/`, {
+        candidato: candidate?.candidato,
+        estado: newEstado,
+        oferta: candidate?.oferta
+      })
+
+      if (response.status === 200) {
+        setCandidate(response.data)
+        
+        toast({
+          description: '¡Estado del postulante actualizado exitosamente!'
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: '¡Oh no!, ocurrió un error',
+        description: '¡No se pudo actualizar el estado del postulante correctamente!'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className='flex items-center gap-10 p-3'>
@@ -76,7 +120,7 @@ export const CandidateInfo = ({ offerId, candidateInfo, candidateInfo2 }: Candid
                     candidate?.estado === 'finalist' && 'Finalista'
                   }
                 </span>
-                <span className='italic text-gray-700'>{candidate?.fecha_aplicacion.toString()}</span>
+                <span className='italic text-gray-700'>{formatDate(candidate?.fecha_aplicacion.toString())}</span>
               </div>
             </div>
             <div className='flex flex-col items-center justify-center gap-1 mr-3'>
@@ -86,11 +130,15 @@ export const CandidateInfo = ({ offerId, candidateInfo, candidateInfo2 }: Candid
               </button>
             </div>
           </div>
-          <button className='flex items-center justify-center w-full gap-2 px-8 py-3 mt-5 font-semibold text-white transition-all duration-300 rounded-md bg-primary hover:brightness-110'>
-            <div className='text-2xl'>
-              <MdCheckCircle />
-            </div>
-            Avanzar a la siguiente etapa
+          <button className='flex items-center justify-center w-full gap-2 px-8 py-3 mt-5 font-semibold text-white transition-all duration-300 rounded-md bg-primary hover:brightness-110' onClick={handleNextStep}>
+            {
+              !isLoading && (
+                <div className='text-2xl'>
+                  <MdCheckCircle />
+                </div>
+              )
+            }
+            {isLoading ? 'Cargando...' : 'Avanzar a la siguiente etapa'}
           </button>
           <button className='flex items-center justify-center w-full gap-2 px-8 py-3 mt-2 font-semibold transition-all duration-300 border rounded-md bg-background border-primary hover:bg-gray-100' onClick={() => navigate(-1)}>
             Volver

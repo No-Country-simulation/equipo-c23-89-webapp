@@ -65,6 +65,7 @@ export default function CandidatesOfferRecruiter () {
                   )
                 : (
                     <CandidatesTabs
+                      offerId={Number(offerId)}
                       candidatesPostulates={candidatesPostulates}
                     />
                   )

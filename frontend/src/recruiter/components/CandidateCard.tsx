@@ -8,10 +8,11 @@ import { type User } from '../types/recruiter'
 import { useNavigate } from 'react-router-dom'
 
 interface CandidateCardProps {
+  offerId: number
   candidate: Aplicacion
 }
 
-export const CandidateCard = ({ candidate }: CandidateCardProps) => {
+export const CandidateCard = ({ offerId, candidate }: CandidateCardProps) => {
   const [candidateInfo, setCandidateInfo] = useState<Candidate | undefined>(undefined)
   const [candidateInfo2, setCandidateInfo2] = useState<User | undefined>(undefined)
   const { candidates } = useCandidates()
@@ -20,7 +21,7 @@ export const CandidateCard = ({ candidate }: CandidateCardProps) => {
 
   useEffect(() => {
     const candidateInfoCard = candidates.find(c => c.id === candidate.candidato)
-    const candidateInfoCard2 = users.find(c => c.id === candidateInfoCard?.usuario)
+    const candidateInfoCard2 = users.find(c => c.id === candidateInfoCard?.user.id)
 
     setCandidateInfo(candidateInfoCard)
     setCandidateInfo2(candidateInfoCard2)
@@ -36,7 +37,7 @@ export const CandidateCard = ({ candidate }: CandidateCardProps) => {
   }
 
   const navigateToCandidateInfo = () => {
-    navigate(`/recruiter/candidate/${candidate.candidato}`)
+    navigate(`/recruiter/candidate/${offerId}/${candidate.candidato}`)
   }
 
   return (
