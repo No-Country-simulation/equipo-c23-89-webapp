@@ -26,7 +26,7 @@ export default function CandidateRecruiter () {
 
   useEffect(() => {
     const candidateInfoCard = candidates.find(c => c.id === Number(candidateId))
-    const candidateInfoCard2 = users.find(c => c.id === candidateInfoCard?.usuario)
+    const candidateInfoCard2 = users.find(c => c.id === candidateInfoCard?.user.id)
 
     if (!candidateInfoCard2) navigate('/recruiter/home')
 

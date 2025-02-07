@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAplicacionStore } from '../store/aplicacion'
-import axios from 'axios'
 import { type Aplicacion } from '../types/aplicacion'
+import api from '@/lib/api'
 
 export const useCandidatesPostulates = ({ idOferta }: { idOferta: number }) => {
   const candidatesPostulates = useAplicacionStore(state => state.aplicaciones)
@@ -13,7 +13,7 @@ export const useCandidatesPostulates = ({ idOferta }: { idOferta: number }) => {
       try {
         setLoadingCandidatesPostulates(true)
 
-        const response = await axios.get('http://localhost:8000/aplicaciones/aplicaciones/')
+        const response = await api.get('/aplicaciones/aplicaciones/')
         const candidatesPostulatesOffer: Aplicacion[] = response.data.filter((c: Aplicacion) => c.oferta === idOferta)
 
         setCandidatesPostulates(candidatesPostulatesOffer)
@@ -25,7 +25,7 @@ export const useCandidatesPostulates = ({ idOferta }: { idOferta: number }) => {
     }
 
     getCandidatesPostulates()
-  }, [])
+  }, [idOferta])
 
   return { candidatesPostulates, loadingCandidatesPostulates, setCandidatesPostulates }
 }

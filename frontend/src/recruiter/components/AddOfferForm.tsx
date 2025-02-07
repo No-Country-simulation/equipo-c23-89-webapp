@@ -15,6 +15,8 @@ import { AiFillFileAdd } from 'react-icons/ai'
 import { offerSchema } from '../schemas/offerSchema'
 import api from '@/lib/api'
 import { type Offer } from '../types/offer'
+import useLocalStorage from '@/hooks/useLocalStorage'
+import { useRecruiter } from '../hooks/useRecruiter'
 
 interface AddOfferFormProps {
   offers: Offer[]
@@ -23,6 +25,8 @@ interface AddOfferFormProps {
 }
 
 export const AddOfferForm = ({ offers, setOffers, setOpen }: AddOfferFormProps) => {
+  const { storedValue } = useLocalStorage<{ email: string, role: string } | null>('user', null)
+  const { recruiter } = useRecruiter({ email: storedValue?.email || '' })
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
@@ -40,13 +44,13 @@ export const AddOfferForm = ({ offers, setOffers, setOpen }: AddOfferFormProps) 
     try {
       setIsLoading(true)
 
-      const response = await api.post('/oferta', {
+      const response = await api.post('/api/oferta/', {
         titulo: values.title,
         descripcion: values.description,
         ubicacion: values.location,
         salario: values.salary,
         fecha_publicacion: new Date().toISOString(),
-        id_reclutador: 1
+        id_reclutador: recruiter?.id
       })
 
       if (response.status === 201) {
